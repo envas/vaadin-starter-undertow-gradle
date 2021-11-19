@@ -1,0 +1,69 @@
+// *******************************************************
+//   Plugins
+// *******************************************************
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id "com.vaadin" version "${vaadinPluginVersion}"
+}
+
+// *******************************************************
+//   Repositories
+// *******************************************************
+repositories {
+    mavenCentral()
+    jcenter()
+    maven { url "https://maven.vaadin.com/vaadin-addons" }
+}
+
+sourceCompatibility = '11'
+
+// *******************************************************
+//   Vaadin
+// *******************************************************
+vaadin {
+    optimizeBundle = true
+    productionMode = true
+}
+
+// *******************************************************
+//   Dependencies
+// *******************************************************
+dependencies {
+
+    // Vaadin
+    implementation enforcedPlatform("com.vaadin:vaadin-bom:$vaadinVersion")
+    implementation "com.vaadin:vaadin-core:$vaadinVersion"
+
+    // Container as implementation, must be included in fatjar
+    implementation "javax.servlet:javax.servlet-api:3.1.0"
+
+    // Undertow server (since Vaadin 14.6 error 403/Forbidden)
+    implementation "io.undertow:undertow-core:${undertowVersion}"
+    implementation "io.undertow:undertow-servlet:${undertowVersion}"
+    implementation "io.undertow:undertow-websockets-jsr:${undertowVersion}"
+
+    // Logging
+    // currently we are logging through the SLF4J API to SLF4J-Simple.
+    // See src/main/resources/simplelogger.properties file for the logger
+    // configuration
+    implementation "org.slf4j:slf4j-simple:1.7.30"
+}
+
+// *******************************************************
+//       Package content
+// *******************************************************
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Vaadin starter',
+                'Implementation-Version': '1.0.0',
+                'Main-Class': 'com.vaadin.starter.Starter',
+                'Built-Date': new Date(),
+                'Built-JDK': System.getProperty('java.version'),
+                'Multi-Release': true
+
+    }
+}
+
+shadowJar {
+    archiveBaseName = 'vaadinStarter'
+}
