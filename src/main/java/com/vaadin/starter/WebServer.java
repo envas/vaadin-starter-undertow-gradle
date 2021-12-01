@@ -10,8 +10,11 @@
 
 package com.vaadin.starter;
 
-import com.vaadin.flow.server.startup.RouteRegistryInitializer;
-import com.vaadin.flow.server.startup.ServletDeployer;
+
+import com.vaadin.flow.di.LookupInitializer;
+import com.vaadin.flow.router.InternalServerError;
+import com.vaadin.flow.router.RouteNotFoundError;
+import com.vaadin.flow.server.startup.*;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.DefaultByteBufferPool;
@@ -63,7 +66,10 @@ public class WebServer {
                     .setDeploymentName("starter")
                     .setDefaultEncoding("UTF-8")
                     .setResourceManager(resMgr)
-                    .addServletContainerInitializer(routesInitializer)
+                    .addServletContainerInitializer(getRouteRegistryInitializer())
+                    .addServletContainerInitializer(getDevModeInitializer())
+                    .addServletContainerInitializer(getErrorNavigationTargetInitializer())
+                    .addServletContainerInitializer(getLookupServletContainerInitializer())
                     .addListener(Servlets.listener(ServletDeployer.class))
                     .addServletContextAttribute(WebSocketDeploymentInfo.ATTRIBUTE_NAME, wsdi);
             //J+
@@ -95,4 +101,64 @@ public class WebServer {
 
         return set;
     }
+
+
+    /**
+     * Returns initializer info for @Route annotated classes.
+     *
+     * @return registry initializer for @Route annotated classes
+     */
+    public ServletContainerInitializerInfo getRouteRegistryInitializer() {
+
+        Set<Class<?>> set = new HashSet<>();
+        set.add(MainView.class);
+
+        return new ServletContainerInitializerInfo(RouteRegistryInitializer.class,set) ;
+    }
+
+    /**
+     * Returns initializer info for @NpmPackage, @JsModule, @CssImport, @JavaScript or @Theme
+     * annotated classes.
+     *
+     * @return initializer for @NpmPackage, @JsModule, @CssImport, @JavaScript or @Theme
+     *         annotated classes
+     */
+    public static ServletContainerInitializerInfo getDevModeInitializer() {
+
+        Set<Class<?>> set = new HashSet<>();
+        set.add(MainView.class);
+
+        return new ServletContainerInitializerInfo(DevModeInitializer.class,set);
+    }
+
+    /**
+     * Returns initializer info for anything implementing HasErrorParameter.
+     *
+     * @return initializer for classes implementing HasErrorParameter
+     */
+    public static ServletContainerInitializerInfo getErrorNavigationTargetInitializer() {
+
+        Set<Class<?>> set = new HashSet<>();
+        set.add(RouteNotFoundError.class);
+        set.add(InternalServerError.class);
+
+        return new ServletContainerInitializerInfo(ErrorNavigationTargetInitializer.class,set);
+    }
+
+    /**
+     * Returns initializer info for internals used for integrating with either of Spring, CDI or OSGi
+     *
+     * <b>IMPORTANT</b>: remove for Vaadin version < 14.6
+     *
+     * @return initializer for internals used for integrating with either of Spring, CDI or OSGi
+     */
+    public static ServletContainerInitializerInfo getLookupServletContainerInitializer() {
+
+        Set<Class<?>> set = new HashSet<>();
+        set.add(LookupInitializer.class);
+
+        return new ServletContainerInitializerInfo(LookupServletContainerInitializer.class,set);
+    }
+
+
 }
