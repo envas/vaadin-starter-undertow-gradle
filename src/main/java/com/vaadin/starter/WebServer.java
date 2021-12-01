@@ -123,7 +123,7 @@ public class WebServer {
      * @return initializer for @NpmPackage, @JsModule, @CssImport, @JavaScript or @Theme
      *         annotated classes
      */
-    public static ServletContainerInitializerInfo getDevModeInitializer() {
+    public ServletContainerInitializerInfo getDevModeInitializer() {
 
         Set<Class<?>> set = new HashSet<>();
         set.add(MainView.class);
@@ -136,7 +136,7 @@ public class WebServer {
      *
      * @return initializer for classes implementing HasErrorParameter
      */
-    public static ServletContainerInitializerInfo getErrorNavigationTargetInitializer() {
+    public ServletContainerInitializerInfo getErrorNavigationTargetInitializer() {
 
         Set<Class<?>> set = new HashSet<>();
         set.add(RouteNotFoundError.class);
@@ -152,7 +152,7 @@ public class WebServer {
      *
      * @return initializer for internals used for integrating with either of Spring, CDI or OSGi
      */
-    public static ServletContainerInitializerInfo getLookupServletContainerInitializer() {
+    public ServletContainerInitializerInfo getLookupServletContainerInitializer() {
 
         Set<Class<?>> set = new HashSet<>();
         set.add(LookupInitializer.class);
